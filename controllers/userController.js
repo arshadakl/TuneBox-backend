@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import { User } from "../models/userModel.js";
 import CustomError from "../utils/CustomError.js";
 import jwt from "jsonwebtoken";
+import { Music } from "../models/musicsModel.js";
 
 // ==========================
 // JWT Token Generator
@@ -27,7 +28,6 @@ const _Signup = async (req, res, next) => {
       throw new CustomError("Please fill the all fields", 422);
     }
 
-    //checking user Exist
     const existingEmail = await User.findOne({ email });
     if (existingEmail) {
       throw new CustomError("Email already exists", 400);
@@ -39,7 +39,6 @@ const _Signup = async (req, res, next) => {
 
     const encryptedPassword = await bcrypt.hash(password, 10);
 
-    //store new user Data
     const UserData = await User({
       username,
       email,
@@ -51,12 +50,12 @@ const _Signup = async (req, res, next) => {
     const token = generateToken(UserData);
     const user = { username, email, token };
     res.cookie("token", token, {
-      //   httpOnly: true,
+      httpOnly: false, 
       secure: process.env.NODE_ENV === "production",
       maxAge: 24 * 60 * 60 * 1000,
     });
 
-    res.status(200).json({ message: "Account Created successful", user });
+    res.status(200).json({success:true, message: "Account Created successfully", user });
   } catch (error) {
     next(error);
   }
@@ -88,4 +87,23 @@ const _Login = async (req, res, next) => {
       next(error); 
     }
   };
-export { _Signup,_Login };
+
+
+  // ==========================
+// add new musics Controller
+// ==========================
+
+const _addMusic = async(req,res,next)=>{
+  try {
+      const {title,singers,duration,url,language} = req.body
+      console.log(title,singers,duration,url,language);
+      const MusicData = await Music.create({
+        title,singers,duration,url,language
+      })
+     console.log(MusicData);
+      res.status(201).json({message:"New Music Added"})
+  } catch (error) {
+    next(error)
+  }
+}
+export { _Signup,_Login,_addMusic };
