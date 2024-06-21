@@ -7,6 +7,7 @@ import CustomError from './utils/CustomError.js';
 import cors from "cors"
 import 'dotenv/config';
 const app = express();
+const PORT = process.env.PORT
 DBConnection()
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -14,7 +15,7 @@ app.use(bodyParser.json());
 
 app.use(
   cors({
-    origin: ["http://localhost:5173"],
+    origin: ["http://localhost:5173","https://tune-box.vercel.app/"],
     methods: ["GET,PUT,PATCH,POST,DELETE"],
     credentials: true,
   })
@@ -29,6 +30,6 @@ app.use((err, req, res, next) => {
   });
 });
 
-app.listen(8080, () => {
-    console.log("Server Running on Port 8080");
+app.listen(PORT, () => {
+    console.log(`Server Running on Port ${PORT}`);
 });
