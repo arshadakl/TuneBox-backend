@@ -50,12 +50,18 @@ const _Signup = async (req, res, next) => {
     const token = generateToken(UserData);
     const user = { username, email, token };
     res.cookie("token", token, {
-      httpOnly: false, 
+      httpOnly: false,
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+    res.cookie("user", user.username, {
       secure: process.env.NODE_ENV === "production",
       maxAge: 24 * 60 * 60 * 1000,
     });
 
-    res.status(200).json({success:true, message: "Account Created successfully", user });
+    res
+      .status(200)
+      .json({ success: true, message: "Account Created successfully", user });
   } catch (error) {
     next(error);
   }
@@ -65,45 +71,86 @@ const _Signup = async (req, res, next) => {
 // Login Controller
 // ==========================
 const _Login = async (req, res, next) => {
-    try {
-      const { username, password } = req.body;
-      if (!(username && password)) {
-        throw new CustomError("Please fill all fields", 422);
-      }
-  
-      const user = await User.findOne({ username });
-      if (!user || !(await bcrypt.compare(password, user.password))) {
-        throw new CustomError("Invalid username or password", 401);
-      }
-  
-      const token = generateToken(user);
-      res.cookie("token", token, {
-        secure: process.env.NODE_ENV === "production",
-        maxAge: 24 * 60 * 60 * 1000,
-      });
-  
-      res.status(200).json({ message: "Login successful", user: { username: user.username, email: user.email } });
-    } catch (error) {
-      next(error); 
-    }
-  };
-
-
-  // ==========================
-// add new musics Controller
-// ==========================
-
-const _addMusic = async(req,res,next)=>{
   try {
-      const {title,singers,duration,url,language} = req.body
-      console.log(title,singers,duration,url,language);
-      const MusicData = await Music.create({
-        title,singers,duration,url,language
-      })
-     console.log(MusicData);
-      res.status(201).json({message:"New Music Added"})
+    const { username, password } = req.body;
+    console.log(username, password);
+    if (!(username && password)) {
+      throw new CustomError("Please fill all fields", 422);
+    }
+
+    const user = await User.findOne({ username });
+    if (!user || !(await bcrypt.compare(password, user.password))) {
+      throw new CustomError("Invalid username or password", 401);
+    }
+
+    const token = generateToken(user);
+    res.cookie("token", token, {
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+    res.cookie("user", user.username, {
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+
+    res
+      .status(200)
+      .json({
+        success: true,
+        message: "Login successful",
+        user: { username: user.username, email: user.email },
+      });
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+const _logout = async(req,res,next)=>{
+  try {
+    res.cookie("token", "", { maxAge: 0 });
+    res.cookie("user", "", { maxAge: 0 });
+    res.status(200).json({success:true, message: "Logged out successfully" });
   } catch (error) {
     next(error)
   }
 }
-export { _Signup,_Login,_addMusic };
+
+// ==========================
+// add new musics Controller
+// ==========================
+
+const _addMusic = async (req, res, next) => {
+  try {
+    const user = req.user
+    const { title, singers, duration, url, thumbnailUrl,startTime ,endTime} = req.body;
+    // console.log(title, singers, duration, url, thumbnailUrl);
+    // console.log("user details :", req.user);
+    const existingMusic = await Music.findOne({ user: user._id, url });
+    console.log(existingMusic);
+    if(existingMusic){
+      throw new CustomError("Music already in your Box",400)
+    }
+    const newMusicData = new Music({
+      user:user._id,
+      title, singers, duration, url, thumbnailUrl,startTime ,endTime
+    });
+
+    const MusicData = await newMusicData.save();
+    console.log(MusicData);
+    res.status(201).json({success: true, message: "New Music Added", data: MusicData });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const _userPlaylist = async(req,res,next)=>{
+  try {
+    const user = req.user
+    const playList = await Music.find({user:user._id}).sort({updatedAt:-1})
+    res.status(200).json({success:true,music:playList})
+  } catch (error) {
+    next(error)
+  }
+}
+export { _Signup, _Login,_logout, _addMusic,_userPlaylist };

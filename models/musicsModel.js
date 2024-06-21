@@ -1,25 +1,39 @@
 import mongoose, { Schema } from "mongoose";
 
-const MusicScheema = new Schema({
-    title:{
-        type:String,
-        require:true
+const musicSchema = new Schema(
+  {
+    user: {
+      type: mongoose.Types.ObjectId,
+      required: true,
     },
-    singers:{
-        type:String,
+    title: {
+      type: String,
+      required: true,
     },
-    duration:{
-        type:Number,
-        require:true
+    singers: {
+      type: String,
     },
-    url:{
-        type:String,
-        require:true
+    duration: {
+      type: String,
+      required: true,
     },
-    language:{
-        type:String
+    url: {
+      type: String,
+      required: true,
+    },
+    thumbnailUrl: {
+      type: String,
+    },
+    startTime:{
+        type:Number
+    },
+    endTime:{
+        type:Number
     }
-})
+  },
+  {
+    timestamps: true,
+  }
+);
 
-
-export const Music = mongoose.model("music",MusicScheema)
+export const Music = mongoose.model("Music", musicSchema);
