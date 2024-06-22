@@ -21,7 +21,7 @@ const cookiePre = {
   httpOnly: true,
   secure: true, 
   sameSite: 'none',
-  domain: '.specsy.store',
+  domain: 'tunebox.specsy.store',
   maxAge: 24 * 60 * 60 * 1000
 }
 
