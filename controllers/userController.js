@@ -57,16 +57,9 @@ const _Signup = async (req, res, next) => {
 
     const token = generateToken(UserData);
     const user = { username, email, token };
-    res.cookie("token", token, {
-      ...cookiePre
-    });
-    res.cookie("user", user.username, {
-      ...cookiePre
-    });
+  
 
-    res
-      .status(200)
-      .json({ success: true, message: "Account Created successfully", user });
+    res.status(200).json({ success: true, message: "Account Created successfully", user });
   } catch (error) {
     next(error);
   }
@@ -89,17 +82,11 @@ const _Login = async (req, res, next) => {
     }
 
     const token = generateToken(user);
-    res.cookie("token", token, {
-      ...cookiePre
-    });
-    res.cookie("user", user.username, {
-      ...cookiePre
-    });
-    console.log('Cookie set:', res.getHeaders()['set-cookie']);
+    
     res.status(200).json({
       success: true,
       message: "Login successful",
-      user: { username: user.username, email: user.email },
+      user: { username: user.username, email: user.email,token },
     });
   } catch (error) {
     next(error);
