@@ -21,7 +21,7 @@ const cookiePre = {
   httpOnly: true,
   secure: true, 
   sameSite: 'none',
-  domain: 'tune-box.vercel.app',
+  domain: 'vercel.app',
   maxAge: 24 * 60 * 60 * 1000
 }
 
