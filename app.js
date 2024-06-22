@@ -25,7 +25,11 @@ app.use(cors({
   origin: 'https://tune-box.vercel.app',
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  cookie: {
+    secure: 'auto',
+    sameSite: 'none'
+  }
 }));
 
 app.use(cookieParser());

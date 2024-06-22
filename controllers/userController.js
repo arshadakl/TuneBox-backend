@@ -20,7 +20,7 @@ const generateToken = (user) => {
 const cookiePre = {
   httpOnly: true,
   secure: true, 
-  sameSite: 'Lax',
+  sameSite: 'none',
   domain: 'tunebox.specsy.store',
   maxAge: 24 * 60 * 60 * 1000
 }
