@@ -95,7 +95,7 @@ const _Login = async (req, res, next) => {
     res.cookie("user", user.username, {
       ...cookiePre
     });
-
+    console.log('Cookie set:', res.getHeaders()['set-cookie']);
     res.status(200).json({
       success: true,
       message: "Login successful",
