@@ -17,6 +17,14 @@ const generateToken = (user) => {
   );
 };
 
+const cookiePre = {
+  httpOnly: true,
+  secure: true, 
+  sameSite: 'none',
+  domain: 'tune-box.vercel.app',
+  maxAge: 24 * 60 * 60 * 1000
+}
+
 // ==========================
 // Siginup Controller
 // ==========================
@@ -50,16 +58,10 @@ const _Signup = async (req, res, next) => {
     const token = generateToken(UserData);
     const user = { username, email, token };
     res.cookie("token", token, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "None",
-      maxAge: 24 * 60 * 60 * 1000,
+      cookiePre
     });
     res.cookie("user", user.username, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "None",
-      maxAge: 24 * 60 * 60 * 1000,
+      cookiePre
     });
 
     res
@@ -88,16 +90,10 @@ const _Login = async (req, res, next) => {
 
     const token = generateToken(user);
     res.cookie("token", token, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "None",
-      maxAge: 24 * 60 * 60 * 1000,
+      cookiePre
     });
     res.cookie("user", user.username, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "None",
-      maxAge: 24 * 60 * 60 * 1000,
+      cookiePre
     });
 
     res.status(200).json({
@@ -113,16 +109,10 @@ const _Login = async (req, res, next) => {
 const _logout = async (req, res, next) => {
   try {
     res.cookie("token", "", {
-      maxAge: 0,
-      httpOnly: true,
-      secure: true,
-      sameSite: "None",
+      cookiePre
     });
     res.cookie("user", "", {
-      maxAge: 0,
-      httpOnly: true,
-      secure: true,
-      sameSite: "None",
+      cookiePre
     });
     res.status(200).json({ success: true, message: "Logged out successfully" });
   } catch (error) {

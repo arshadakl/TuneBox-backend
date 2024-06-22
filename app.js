@@ -9,7 +9,7 @@ import 'dotenv/config';
 const app = express();
 const PORT = process.env.PORT
 DBConnection()
-app.use(cookieParser());
+
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
@@ -20,6 +20,9 @@ app.use(
     credentials: true,
   })
 );
+
+app.use(cookieParser());
+
 app.use('/', userRouter);
 
 app.use((err, req, res, next) => {
