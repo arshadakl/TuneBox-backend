@@ -13,13 +13,18 @@ DBConnection()
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-app.use(
-  cors({
-    origin: ["http://localhost:5173","https://tune-box.vercel.app"],
-    methods: ["GET,PUT,PATCH,POST,DELETE"],
-    credentials: true,
-  })
-);
+// app.use(
+//   cors({
+//     origin: ["http://localhost:5173","https://tune-box.vercel.app"],
+//     methods: ["GET,PUT,PATCH,POST,DELETE"],
+//     credentials: true,
+//   })
+// );
+
+app.use(cors({
+  origin: 'https://tune-box.vercel.app',
+  credentials: true
+}));
 
 app.use(cookieParser());
 
