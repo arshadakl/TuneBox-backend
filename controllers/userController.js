@@ -50,12 +50,15 @@ const _Signup = async (req, res, next) => {
     const token = generateToken(UserData);
     const user = { username, email, token };
     res.cookie("token", token, {
-      httpOnly: false,
-      secure: process.env.NODE_ENV === "production",
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
       maxAge: 24 * 60 * 60 * 1000,
     });
     res.cookie("user", user.username, {
-      secure: process.env.NODE_ENV === "production",
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
       maxAge: 24 * 60 * 60 * 1000,
     });
 
@@ -85,36 +88,47 @@ const _Login = async (req, res, next) => {
 
     const token = generateToken(user);
     res.cookie("token", token, {
-      secure: process.env.NODE_ENV === "production",
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
       maxAge: 24 * 60 * 60 * 1000,
     });
     res.cookie("user", user.username, {
-      secure: process.env.NODE_ENV === "production",
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
       maxAge: 24 * 60 * 60 * 1000,
     });
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "Login successful",
-        user: { username: user.username, email: user.email },
-      });
+    res.status(200).json({
+      success: true,
+      message: "Login successful",
+      user: { username: user.username, email: user.email },
+    });
   } catch (error) {
     next(error);
   }
 };
 
-
-const _logout = async(req,res,next)=>{
+const _logout = async (req, res, next) => {
   try {
-    res.cookie("token", "", { maxAge: 0 });
-    res.cookie("user", "", { maxAge: 0 });
-    res.status(200).json({success:true, message: "Logged out successfully" });
+    res.cookie("token", "", {
+      maxAge: 0,
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+    });
+    res.cookie("user", "", {
+      maxAge: 0,
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+    });
+    res.status(200).json({ success: true, message: "Logged out successfully" });
   } catch (error) {
-    next(error)
+    next(error);
   }
-}
+};
 
 // ==========================
 // add new musics Controller
@@ -122,35 +136,46 @@ const _logout = async(req,res,next)=>{
 
 const _addMusic = async (req, res, next) => {
   try {
-    const user = req.user
-    const { title, singers, duration, url, thumbnailUrl,startTime ,endTime} = req.body;
+    const user = req.user;
+    const { title, singers, duration, url, thumbnailUrl, startTime, endTime } =
+      req.body;
     // console.log(title, singers, duration, url, thumbnailUrl);
     // console.log("user details :", req.user);
     const existingMusic = await Music.findOne({ user: user._id, url });
     console.log(existingMusic);
-    if(existingMusic){
-      throw new CustomError("Music already in your Box",400)
+    if (existingMusic) {
+      throw new CustomError("Music already in your Box", 400);
     }
     const newMusicData = new Music({
-      user:user._id,
-      title, singers, duration, url, thumbnailUrl,startTime ,endTime
+      user: user._id,
+      title,
+      singers,
+      duration,
+      url,
+      thumbnailUrl,
+      startTime,
+      endTime,
     });
 
     const MusicData = await newMusicData.save();
     console.log(MusicData);
-    res.status(201).json({success: true, message: "New Music Added", data: MusicData });
+    res
+      .status(201)
+      .json({ success: true, message: "New Music Added", data: MusicData });
   } catch (error) {
     next(error);
   }
 };
 
-const _userPlaylist = async(req,res,next)=>{
+const _userPlaylist = async (req, res, next) => {
   try {
-    const user = req.user
-    const playList = await Music.find({user:user._id}).sort({updatedAt:-1})
-    res.status(200).json({success:true,music:playList})
+    const user = req.user;
+    const playList = await Music.find({ user: user._id }).sort({
+      updatedAt: -1,
+    });
+    res.status(200).json({ success: true, music: playList });
   } catch (error) {
-    next(error)
+    next(error);
   }
-}
-export { _Signup, _Login,_logout, _addMusic,_userPlaylist };
+};
+export { _Signup, _Login, _logout, _addMusic, _userPlaylist };
