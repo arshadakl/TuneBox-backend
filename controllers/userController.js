@@ -58,10 +58,10 @@ const _Signup = async (req, res, next) => {
     const token = generateToken(UserData);
     const user = { username, email, token };
     res.cookie("token", token, {
-      cookiePre
+      ...cookiePre
     });
     res.cookie("user", user.username, {
-      cookiePre
+      ...cookiePre
     });
 
     res
@@ -90,10 +90,10 @@ const _Login = async (req, res, next) => {
 
     const token = generateToken(user);
     res.cookie("token", token, {
-      cookiePre
+      ...cookiePre
     });
     res.cookie("user", user.username, {
-      cookiePre
+      ...cookiePre
     });
 
     res.status(200).json({
